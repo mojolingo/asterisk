@@ -191,7 +191,7 @@ static int res_speech_dtmf_deactivate_grammar(struct ast_speech *speech, const c
 /** \brief Write audio to the speech engine */
 static int res_speech_dtmf_write(struct ast_speech *speech, void *data, int len)
 {
-  return -1;
+  return 0;
 }
 
 /** \brief Signal DTMF was received */
