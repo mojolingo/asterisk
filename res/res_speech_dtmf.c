@@ -48,6 +48,8 @@ struct dtmf_recog {
   const char            *grammar;
   /* Wether or not grammar is active */
   bool                  active;
+  /* The DTMF digits received by the recognizer */
+  const char            *buffer;
 };
 
 static int res_speech_dtmf_create(struct ast_speech *speech, struct ast_format *format);
@@ -69,6 +71,7 @@ static int res_speech_dtmf_create(struct ast_speech *speech, struct ast_format *
   recog->speech_base = speech;
   recog->grammar = NULL;
   recog->active = false;
+  recog->buffer = NULL;
   speech->data = recog;
   return 0;
 }
@@ -197,7 +200,10 @@ static int res_speech_dtmf_write(struct ast_speech *speech, void *data, int len)
 /** \brief Signal DTMF was received */
 static int res_speech_dtmf_dtmf(struct ast_speech *speech, const char *dtmf)
 {
-  return -1;
+  dtmf_recog *recog = speech->data;
+  ast_log(LOG_NOTICE, "(%s) Signal DTMF %s\n", recog->name, dtmf);
+  recog->buffer = dtmf;
+  return 0;
 }
 
 /** brief Prepare engine to accept audio */
@@ -221,8 +227,20 @@ static int res_speech_dtmf_change_results_type(struct ast_speech *speech, enum a
 /** \brief Try to get result */
 struct ast_speech_result* res_speech_dtmf_get(struct ast_speech *speech)
 {
+  dtmf_recog *recog = speech->data;
   struct ast_speech_result *speech_result;
   speech_result = ast_calloc(sizeof(struct ast_speech_result), 1);
+
+  if(!recog->buffer == NULL) {
+    return NULL;
+  }
+
+  speech_result->text = strdup(recog->buffer);
+  speech_result->score = 100;
+
+  if(speech_result)
+    ast_set_flag(speech, AST_SPEECH_HAVE_RESULTS);
+
   return speech_result;
 }
 
