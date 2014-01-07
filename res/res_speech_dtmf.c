@@ -203,7 +203,7 @@ static int res_speech_dtmf_dtmf(struct ast_speech *speech, const char *dtmf)
 /** brief Prepare engine to accept audio */
 static int res_speech_dtmf_start(struct ast_speech *speech)
 {
-  return -1;
+  return 0;
 }
 
 /** \brief Change an engine specific setting */
